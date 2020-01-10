@@ -1,0 +1,23 @@
+.header {
+  padding: 0 1em;
+  height: 60px;
+  justify-content: space-between;
+}
+
+a.logo {
+  color: white;
+  text-decoration: none;
+  text-shadow: 4px 2px 6px;
+  font-size: 36px;
+  font-family: monospace;
+  font-weight: bolder;
+}
+
+.brand {
+  color: deepskyblue;
+}
+
+.actions :global(.next-btn-text) {
+  margin-left: 1em;
+  color: white;
+}
