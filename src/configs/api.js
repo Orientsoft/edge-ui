@@ -42,3 +42,8 @@ export const arch = {
   update: PATCH('/arch'),
   delete: DELETE('/arch'),
 };
+
+export const user = {
+  login: POST('/login'),
+  logout: GET('/logout'),
+};

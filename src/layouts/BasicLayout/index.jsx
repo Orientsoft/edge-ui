@@ -3,7 +3,9 @@ import { Switch, Route, Link, withRouter } from 'react-router-dom';
 import { Button, Nav } from '@alifd/next';
 import Layout from '@icedesign/layout';
 import routes from '@/configs/routes';
+import { user } from '@/configs/api';
 import { asideMenuConfig } from '@/configs/menu';
+import { getCurrentUser, removeCurrentUser } from '@/shared/storage';
 import styles from './index.module.scss';
 
 function getSubMenuOrItem(menu, i) {
@@ -54,11 +56,17 @@ const Aside = withRouter(({ location }) => {
 });
 
 export default class BasicLayout extends Component {
-  state = {
-    user: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: getCurrentUser(),
+    };
+  }
 
-  onLogout = () => {};
+  onLogout = () => user.logout().then(() => {
+    removeCurrentUser();
+    this.props.history.push('/login');
+  });
 
   render() {
     const { user } = this.state;
@@ -69,7 +77,7 @@ export default class BasicLayout extends Component {
           <a href="/" className={styles.logo}><span className={styles.brand}>Edge</span>UI</a>
           {user ? (
             <div className={styles.actions}>
-              <Button text>{user.name}</Button>
+              <Button text>{user.username}</Button>
               <Button text onClick={this.onLogout}>退出</Button>
             </div>
           ) : (
