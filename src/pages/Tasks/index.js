@@ -122,6 +122,7 @@ export default () => {
       <Table dataSource={dataSource}>
         <Table.Column dataIndex="name" title="名称" />
         <Table.Column dataIndex="service_name" title="服务" />
+        <Table.Column dataIndex="nodes" title="已部署节点数" cell={(value) => value.length} />
         <Table.Column dataIndex="running" title="状态" cell={renderStatus} />
         <Table.Column title="操作" width={160} cell={renderActions} />
       </Table>
