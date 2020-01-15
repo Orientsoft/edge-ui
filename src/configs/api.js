@@ -1,7 +1,21 @@
 import API, { GET, POST, PATCH, DELETE } from '@pixcai/make-api';
+import { Message } from '@alifd/next';
+import { removeCurrentUser } from '@/shared/storage';
+import identity from 'lodash-es/identity';
 
+API.request.defaults.baseURL = '/api/v1';
 API.request.defaults.timeout = 600000;
 API.request.defaults.withCredentials = true;
+
+API.request.interceptors.response.use(identity , (error) => {
+  if (error.response) {
+    if (error.response.status === 403) {
+      removeCurrentUser();
+    }
+    Message.error(error.response.data);
+  }
+  return Promise.reject(error);
+});
 
 export const tag = {
   query: GET('/tag'),

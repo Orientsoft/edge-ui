@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 export default [
   {
-    path: '/tags',
+    path: '/',
     component: lazy(() => import('@/pages/Tags')),
   },
   {

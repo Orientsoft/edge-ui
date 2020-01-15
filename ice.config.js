@@ -17,7 +17,10 @@ module.exports = {
   proxy: {
     '/**': {
       enable: true,
-      target: 'http://192.168.0.50:31783',
+      target: 'http://192.168.0.186:31783',
     },
+  },
+  devServer: {
+    historyApiFallback: true,
   },
 };

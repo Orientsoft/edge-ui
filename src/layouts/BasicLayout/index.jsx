@@ -70,6 +70,7 @@ export default class BasicLayout extends Component {
 
   render() {
     const { user } = this.state;
+    const { history } = this.props;
 
     return (
       <Layout fixable>
@@ -77,18 +78,18 @@ export default class BasicLayout extends Component {
           <a href="/" className={styles.logo}><span className={styles.brand}>Edge</span>UI</a>
           {user ? (
             <div className={styles.actions}>
-              <Button text>{user.username}</Button>
+              <span className={styles.username}>{user.username}</span>
               <Button text onClick={this.onLogout}>退出</Button>
             </div>
           ) : (
-            <Button type="primary">登录</Button>
+            <Button type="primary" onClick={() => history.push('/login')}>登录</Button>
           )}
         </Layout.Header>
-        <Layout.Section scrollable>
+        <Layout.Section>
           <Layout.Aside width={200} type="primary">
             <Aside />
           </Layout.Aside>
-          <Layout.Main>
+          <Layout.Main scrollable>
             <Switch>
               {routes.filter(item => item.component).map((item, i) => (
                 <Route key={i} exact path={item.path} component={item.component} />

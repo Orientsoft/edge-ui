@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Pagination, Select } from '@alifd/next';
 import styles from './index.module.scss';
 
-const PopupContent = ({ dataSource, pageSize = 20, ...props }) => {
+const PopupContent = ({ dataSource, pageSize = 10, ...props }) => {
   const [data, setData] = useState([]);
   const [current, setCurrent] = useState(1);
   const total = Array.isArray(dataSource) ? dataSource.length : 0;

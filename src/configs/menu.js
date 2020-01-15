@@ -1,7 +1,7 @@
 export const asideMenuConfig = [
   {
     name: '标签管理',
-    path: '/tags',
+    path: '/',
     icon: 'atm',
   },
   {

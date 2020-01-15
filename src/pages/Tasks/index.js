@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Dialog, Field, Form, Input, Table, Select } from '@alifd/next';
 import TableSelect from '@/components/TableSelect';
+import flatten from 'lodash-es/flatten';
 import { DialogType } from '@/shared/types';
 import { service, task as store } from '@/configs/api';
 import styles from './index.module.scss';
@@ -11,10 +12,19 @@ export default () => {
   const [services, setServices] = useState([]);
   const [nodes, setNodes] = useState([]);
   const [selectedNodes, setSelectedNodes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState([]);
   const [dialogType, setDialogType] = useState(DialogType.None);
   const field = Field.useField();
+  const onFilter = (tag) => {
+    console.log(tag);
+  };
   const refresh = () => {
-    store.query().then(({ data }) => setDataSource(data));
+    setIsLoading(true);
+    store.query().then(({ data }) => {
+      setIsLoading(false);
+      setDataSource(data);
+    });
   };
   const onCreate = () => {
     field.validate((errors, values) => {
@@ -93,22 +103,31 @@ export default () => {
     setNodes([]);
     setSelectedNodes(item.nodes);
     setDialogType(DialogType.Update);
-    service.queryNodes({}, { serviceId: item.service_id }).then(({ data }) => setNodes(data));
+    service.queryNodes({}, { serviceId: item.service_id }).then(({ data }) => {
+      setNodes(data);
+      // setFilters(flatten(data.map(({ buss_tags }) => buss_tags))
+      //   .map(({ id, name }) => ({ label: name, value: id })));
+    });
   };
-  // const openDeleteDialog = (item) => Dialog.confirm({
-  //   title: '删除任务',
-  //   content: '确定删除当前任务？',
-  //   closeable: false,
-  //   onOk: () => store.delete({ data: { id: item.id } }).then(refresh),
-  // });
+  const openDeleteDialog = (item) => Dialog.confirm({
+    title: '删除任务',
+    content: '确定删除当前任务？',
+    closeable: false,
+    onOk: () => store.delete({ data: { id: item.id } }).then(refresh),
+  });
   const renderStatus = (value) => {
     return value ? <span className={styles.online}>运行中</span> : <span className={styles.offline}>未运行</span>;
+  };
+  const renderNodes = (nodes) => {
+    const totalNodes = nodes.length;
+    const onlineNodes = nodes.filter(({ online }) => online).length;
+    return `${onlineNodes}/${totalNodes}`;
   };
   const renderActions = (value, i, item) => (
     <div className={styles.actions}>
       <Button type="primary" onClick={() => onToggleTask(item)}>{item.running ? '停止' : '启动'}</Button>
-      <Button type="secondary" onClick={() => openUpdateDialog(item)}>编辑</Button>
-      {/* <Button type="normal" warning onClick={() => openDeleteDialog(item)}>删除</Button> */}
+      <Button type="secondary" disabled={item.running} onClick={() => openUpdateDialog(item)}>编辑</Button>
+      <Button type="normal" disabled={item.running} warning onClick={() => openDeleteDialog(item)}>删除</Button>
     </div>
   );
 
@@ -119,12 +138,12 @@ export default () => {
       <div className={styles.toolbar}>
         <Button type="primary" onClick={openCreateDialog}>新建任务</Button>
       </div>
-      <Table dataSource={dataSource}>
+      <Table dataSource={dataSource} loading={isLoading}>
         <Table.Column dataIndex="name" title="名称" />
         <Table.Column dataIndex="service_name" title="服务" />
-        <Table.Column dataIndex="nodes" title="已部署节点数" cell={(value) => value.length} />
+        <Table.Column dataIndex="nodes" title="在线数/总节点数" cell={renderNodes} />
         <Table.Column dataIndex="running" title="状态" cell={renderStatus} />
-        <Table.Column title="操作" width={160} cell={renderActions} />
+        <Table.Column title="操作" width={220} cell={renderActions} />
       </Table>
       <Dialog
         visible={dialogType === DialogType.Create}
@@ -172,9 +191,10 @@ export default () => {
               value={selectedNodes.map(({ id, name }) => ({ label: name, value: id }))}
               rowSelection={rowSelection}
               dataSource={nodes}
+              onFilter={onFilter}
             >
               <TableSelect.Column title="名称" dataIndex="name" />
-              <TableSelect.Column title="类型" dataIndex="arch" />
+              <TableSelect.Column title="类型" dataIndex="arch" filters={filters} filterMode="single" />
             </TableSelect>
           </Form.Item>
         </Form>

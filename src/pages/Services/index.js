@@ -9,10 +9,15 @@ import styles from './index.module.scss';
 export default () => {
   const [dataSource, setDataSource] = useState([]);
   const [tags, setTags] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const field = Field.useField();
   const [dialogType, setDialogType] = useState(DialogType.None);
   const refresh = () => {
-    store.query().then(({ data }) => setDataSource(data));
+    setIsLoading(true);
+    store.query().then(({ data }) => {
+      setIsLoading(false);
+      setDataSource(data);
+    });
   };
   const openCreateDialog = () => {
     field.reset();
@@ -20,9 +25,12 @@ export default () => {
     tag.query({ params: { type: '体系' } }).then(({ data }) => setTags(data));
   };
   const openUpdateDialog = (item) => {
-    field.setValues(item);
+    field.setValues({
+      ...item,
+      kubernetes: JSON.stringify(item.kubernetes, null, 2),
+    });
     setDialogType(DialogType.Update);
-    tag.query({ params: { type: '体系' } }).then(({ data }) => setTags(data));
+    tag.query({ params: { type: '业务' } }).then(({ data }) => setTags(data));
   };
   const onCreate = () => {
     field.validate((errors, values) => {
@@ -51,7 +59,7 @@ export default () => {
     setDialogType(DialogType.Inspect);
   };
   const renderTags = (value) => {
-    return value.map(({ tag_name }) => tag_name).join('，');
+    return value.map(({ name }) => name).join('，');
   };
   const renderActions = (value, i, item) => (
     <div className={styles.actions}>
@@ -67,7 +75,7 @@ export default () => {
       <div className={styles.toolbar}>
         <Button type="primary" onClick={openCreateDialog}>新建服务</Button>
       </div>
-      <Table dataSource={dataSource}>
+      <Table dataSource={dataSource} loading={isLoading}>
         <Table.Column dataIndex="name" title="名称" />
         <Table.Column dataIndex="image" title="镜像" />
         <Table.Column dataIndex="tags" title="标签" cell={renderTags} />
@@ -83,13 +91,13 @@ export default () => {
       >
         <Form field={field} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} style={{ width: 500 }}>
           <Form.Item label="名称：" required requiredMessage="必填项不能为空">
-            <Input name="name" />
+            <Input name="name" trim />
           </Form.Item>
           <Form.Item label="描述：">
-            <Input name="description" />
+            <Input name="description" trim />
           </Form.Item>
           <Form.Item label="镜像：" required requiredMessage="必填项不能为空">
-            <Input name="image" />
+            <Input name="image" trim />
           </Form.Item>
           <Form.Item label="标签：" required requiredMessage="必填项不能为空">
             <Select name="tagids" mode="multiple">
@@ -97,7 +105,7 @@ export default () => {
             </Select>
           </Form.Item>
           <Form.Item label="配置：" required requiredMessage="必填项不能为空">
-            <Input.TextArea rows={16} name="kubernetes" />
+            <Input.TextArea rows={16} name="kubernetes" trim />
           </Form.Item>
         </Form>
       </Dialog>
@@ -110,10 +118,16 @@ export default () => {
       >
         <Form field={field} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }} style={{ width: 500 }}>
           <Form.Item label="名称：" required requiredMessage="必填项不能为空">
-            <Input name="name" />
+            <Input name="name" trim />
           </Form.Item>
           <Form.Item label="描述：">
-            <Input name="description" />
+            <Input name="description" trim />
+          </Form.Item>
+          <Form.Item label="镜像：" required requiredMessage="必填项不能为空">
+            <Input name="image" trim />
+          </Form.Item>
+          <Form.Item label="配置：" required requiredMessage="必填项不能为空">
+            <Input.TextArea rows={16} name="kubernetes" trim />
           </Form.Item>
         </Form>
       </Dialog>

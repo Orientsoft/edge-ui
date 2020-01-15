@@ -8,8 +8,13 @@ export default () => {
   const [dataSource, setDataSource] = useState([]);
   const field = Field.useField();
   const [dialogType, setDialogType] = useState(DialogType.None);
+  const [isLoading, setIsLoading] = useState(false);
   const refresh = () => {
-    store.query().then(({ data }) => setDataSource(data));
+    setIsLoading(true);
+    store.query().then(({ data }) => {
+      setIsLoading(false);
+      setDataSource(data);
+    });
   };
   const openUpdateDialog = (item) => {
     field.setValues(item);
@@ -58,7 +63,7 @@ export default () => {
       <div className={styles.toolbar}>
         <Button type="primary" onClick={() => setDialogType(DialogType.Create)}>新建标签</Button>
       </div>
-      <Table dataSource={dataSource}>
+      <Table dataSource={dataSource} loading={isLoading}>
         <Table.Column dataIndex="name" title="名称" />
         <Table.Column dataIndex="type" title="类型" />
         <Table.Column title="操作" width={160} cell={renderActions} />
