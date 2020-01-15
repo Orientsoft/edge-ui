@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Dialog, Field, Form, Input, Table, Select } from '@alifd/next';
 import TableSelect from '@/components/TableSelect';
 import { DialogType } from '@/shared/types';
-import { node, service, task as store } from '@/configs/api';
+import { service, task as store } from '@/configs/api';
 import styles from './index.module.scss';
 
 export default () => {
@@ -50,12 +50,9 @@ export default () => {
       });
     });
   };
-  const onServiceChange = (value) => {
-    const selectedService = services.find(({ id }) => id === value);
-    const tags = selectedService.tags.map(({ tag_id }) => tag_id).join(',');
-
+  const onServiceChange = (serviceId) => {
     setNodes([]);
-    node.filterByTags({ params: { tag: tags } }).then(({ data }) => setNodes(data));
+    service.queryNodes({}, { serviceId }).then(({ data }) => setNodes(data));
   };
   const onToggleTask = (item) => {
     Dialog.confirm({
@@ -94,24 +91,16 @@ export default () => {
   const openUpdateDialog = (item) => {
     field.setValues(item);
     setNodes([]);
-    setSelectedNodes([]);
+    setSelectedNodes(item.nodes);
     setDialogType(DialogType.Update);
-    store.queryNodes({}, { taskId: item.id }).then(({ data }) => {
-      setNodes(data.allNodes.map(({ node_id, node_name, node_arch, node_online }) => ({
-        id: node_id,
-        name: node_name,
-        arch: node_arch,
-        online: node_online,
-      })));
-      setSelectedNodes(data.nodes.map(({ node_id, node_name }) => ({ id: node_id, name: node_name })));
-    });
+    service.queryNodes({}, { serviceId: item.service_id }).then(({ data }) => setNodes(data));
   };
-  const openDeleteDialog = (item) => Dialog.confirm({
-    title: '删除任务',
-    content: '确定删除当前任务？',
-    closeable: false,
-    onOk: () => store.delete({ data: { id: item.id } }).then(refresh),
-  });
+  // const openDeleteDialog = (item) => Dialog.confirm({
+  //   title: '删除任务',
+  //   content: '确定删除当前任务？',
+  //   closeable: false,
+  //   onOk: () => store.delete({ data: { id: item.id } }).then(refresh),
+  // });
   const renderStatus = (value) => {
     return value ? <span className={styles.online}>运行中</span> : <span className={styles.offline}>未运行</span>;
   };
@@ -119,7 +108,7 @@ export default () => {
     <div className={styles.actions}>
       <Button type="primary" onClick={() => onToggleTask(item)}>{item.running ? '停止' : '启动'}</Button>
       <Button type="secondary" onClick={() => openUpdateDialog(item)}>编辑</Button>
-      <Button type="normal" warning onClick={() => openDeleteDialog(item)}>删除</Button>
+      {/* <Button type="normal" warning onClick={() => openDeleteDialog(item)}>删除</Button> */}
     </div>
   );
 
@@ -134,7 +123,7 @@ export default () => {
         <Table.Column dataIndex="name" title="名称" />
         <Table.Column dataIndex="service_name" title="服务" />
         <Table.Column dataIndex="running" title="状态" cell={renderStatus} />
-        <Table.Column title="操作" width={220} cell={renderActions} />
+        <Table.Column title="操作" width={160} cell={renderActions} />
       </Table>
       <Dialog
         visible={dialogType === DialogType.Create}

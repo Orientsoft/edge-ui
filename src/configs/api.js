@@ -16,6 +16,7 @@ export const service = {
   create: POST('/service'),
   update: PATCH('/service'),
   delete: DELETE('/service'),
+  queryNodes: GET('/service/node/:serviceId'),
 };
 
 export const node = {
@@ -23,7 +24,6 @@ export const node = {
   create: POST('/node'),
   update: PATCH('/node'),
   delete: DELETE('/node'),
-  filterByTags: GET('/node/tag'),
   createTags: POST('/node/tag'),
 };
 
