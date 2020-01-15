@@ -9,6 +9,7 @@ export default () => {
   const [dataSource, setDataSource] = useState([]);
   const [archs, setArchs] = useState([]);
   const [tags, setTags] = useState([]);
+  const [businessTags, setBusinessTags] = useState([]);
   const field = Field.useField();
   const [dialogType, setDialogType] = useState(DialogType.None);
   const refresh = () => {
@@ -19,10 +20,16 @@ export default () => {
     setDialogType(DialogType.Create);
     arch.query().then(({ data }) => setArchs(data));
     tag.query({ params: { type: '体系' } }).then(({ data }) => setTags(data));
+    tag.query({ params: { type: '业务' } }).then(({ data }) => setBusinessTags(data));
   };
   const openUpdateDialog = (item) => {
-    field.setValues(item);
+    field.setValues({
+      id: item.id,
+      tag: item.buss_tags.map(({ id }) => id),
+      parallel: item.parallel,
+    });
     setDialogType(DialogType.Update);
+    tag.query({ params: { type: '业务' } }).then(({ data }) => setBusinessTags(data));
   };
   const onCreate = () => {
     field.validate((errors, values) => {
@@ -106,24 +113,29 @@ export default () => {
         onCancel={() => setDialogType(DialogType.None)}
       >
         <Form field={field} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} style={{ width: 380 }}>
-          <Form.Item label="名称：" required requiredMessage="必填项不能为空" pattern={/^[a-zA-Z][\w-]*$/} patternMessage="名称只能包含字母、数字或减号且必须以字母开头">
-            <Input name="name" />
+          <Form.Item label="名称：" required requiredMessage="必填项不能为空" pattern={/^[a-z]+$/} patternMessage="名称只能包含字母">
+            <Input name="name" trim />
           </Form.Item>
           <Form.Item label="型号：" required requiredMessage="必填项不能为空">
             <Select name="arch_class_id">
               {archs.map(({ id, name }) => <Select.Option key={id} value={id}>{name}</Select.Option>)}
             </Select>
           </Form.Item>
-          <Form.Item label="标签：" required requiredMessage="必填项不能为空">
+          <Form.Item label="体系标签：" required requiredMessage="必填项不能为空">
             <Select name="tag_id">
               {tags.map(({ id, name }) => <Select.Option key={id} value={id}>{name}</Select.Option>)}
+            </Select>
+          </Form.Item>
+          <Form.Item label="业务标签：" required requiredMessage="必填项不能为空">
+            <Select name="buss_tag_ids" mode="multiple">
+              {businessTags.map(({ id, name }) => <Select.Option key={id} value={id}>{name}</Select.Option>)}
             </Select>
           </Form.Item>
           <Form.Item label="并发数量：" required requiredMessage="必填项不能为空">
             <Input defaultValue={1} min={1} htmlType="number" name="parallel" />
           </Form.Item>
           <Form.Item label="部署数量：" required requiredMessage="必填项不能为空">
-            <Input defaultValue={1} min={1} htmlType="number" name="count" />
+            <Input defaultValue={1} min={1} max={20} htmlType="number" name="count" />
           </Form.Item>
         </Form>
       </Dialog>
@@ -135,6 +147,11 @@ export default () => {
         onCancel={() => setDialogType(DialogType.None)}
       >
         <Form field={field} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} style={{ width: 380 }}>
+          <Form.Item label="业务标签：" required requiredMessage="必填项不能为空">
+            <Select name="tag" mode="multiple">
+              {businessTags.map(({ id, name }) => <Select.Option key={id} value={id}>{name}</Select.Option>)}
+            </Select>
+          </Form.Item>
           <Form.Item label="并发数量：" required requiredMessage="必填项不能为空">
             <Input min={1} htmlType="number" name="parallel" />
           </Form.Item>
