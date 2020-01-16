@@ -3,7 +3,7 @@ import { Message } from '@alifd/next';
 import { removeCurrentUser } from '@/shared/storage';
 import identity from 'lodash-es/identity';
 
-API.request.defaults.baseURL = BACKEND_URL;
+API.request.defaults.baseURL = '/api/v1';
 API.request.defaults.timeout = 600000;
 API.request.defaults.withCredentials = true;
 

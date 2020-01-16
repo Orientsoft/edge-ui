@@ -17,8 +17,10 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
   },
-   define: {
-    // 此处不能省略 JSON.stringify，否则构建过程会出现语法问题
-    BACKEND_URL: JSON.stringify(process.env.BACKEND_URL || 'http://192.168.0.186:31783'),
+  proxy: {
+    '/api/v1': {
+      enable: true,
+      target: 'http://192.168.0.186:31783',
+    },
   },
 };
