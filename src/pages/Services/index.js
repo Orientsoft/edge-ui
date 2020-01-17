@@ -19,6 +19,14 @@ export default () => {
       setDataSource(data);
     });
   };
+  const jsonValidator = (rule, value) => new Promise((resolve, reject) => {
+    try {
+      JSON.parse(value);
+      resolve();
+    } catch (e) {
+      reject(new Error('无效格式'));
+    }
+  });
   const openCreateDialog = () => {
     field.reset();
     setDialogType(DialogType.Create);
@@ -37,7 +45,12 @@ export default () => {
       if (errors) {
         return;
       }
-      store.create({ data: values }).then(() => {
+      store.create({
+        data: {
+          ...values,
+          kubernetes: JSON.parse(values.kubernetes),
+        },
+      }).then(() => {
         setDialogType(DialogType.None);
         refresh();
       });
@@ -48,7 +61,12 @@ export default () => {
       if (errors) {
         return;
       }
-      store.update({ data: values }).then(() => {
+      store.update({
+        data: {
+          ...values,
+          kubernetes: JSON.parse(values.kubernetes),
+        },
+      }).then(() => {
         setDialogType(DialogType.None);
         refresh();
       });
@@ -104,7 +122,7 @@ export default () => {
               {tags.map(({ id, name }) => <Select.Option key={id} value={id}>{name}</Select.Option>)}
             </Select>
           </Form.Item>
-          <Form.Item label="配置：" required requiredMessage="必填项不能为空">
+          <Form.Item label="配置：" required requiredMessage="必填项不能为空" validator={jsonValidator}>
             <Input.TextArea rows={16} name="kubernetes" trim />
           </Form.Item>
         </Form>
@@ -126,7 +144,7 @@ export default () => {
           <Form.Item label="镜像：" required requiredMessage="必填项不能为空">
             <Input name="image" trim />
           </Form.Item>
-          <Form.Item label="配置：" required requiredMessage="必填项不能为空">
+          <Form.Item label="配置：" required requiredMessage="必填项不能为空" validator={jsonValidator}>
             <Input.TextArea rows={16} name="kubernetes" trim />
           </Form.Item>
         </Form>
