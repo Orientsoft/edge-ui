@@ -115,6 +115,8 @@ export default () => {
       </div>
       <Table dataSource={dataSource} loading={isLoading}>
         <Table.Column dataIndex="name" title="名称" />
+        <Table.Column dataIndex="arch_class_name" title="型号" />
+        <Table.Column dataIndex="tags.name" title="体系标签" />
         <Table.Column dataIndex="updatedAt" title="操作时间" cell={renderDate} />
         <Table.Column dataIndex="parallel" title="并发数量" />
         <Table.Column dataIndex="online" title="状态" cell={renderStatus} />
