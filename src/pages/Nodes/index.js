@@ -140,7 +140,7 @@ export default () => {
         onCancel={() => setDialogType(DialogType.None)}
       >
         <Form field={field} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} style={{ width: 380 }}>
-          <Form.Item label="名称：" required requiredMessage="必填项不能为空" pattern={/^[a-z]+$/} patternMessage="名称只能包含字母">
+          <Form.Item label="名称：" required requiredMessage="必填项不能为空" pattern={/^[a-z]+[0-9a-zA-Z-]*$/} patternMessage="名称只能包含字母、数字或减号且开头必须是小写字母">
             <Input name="name" trim />
           </Form.Item>
           <Form.Item label="型号：" required requiredMessage="必填项不能为空">
