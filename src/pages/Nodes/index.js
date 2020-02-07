@@ -8,7 +8,7 @@ import styles from './index.module.scss';
 const PAGE_SIZE = 10;
 
 export default () => {
-  const [dataSource, setDataSource] = useState([]);
+  const [dataSource, setDataSource] = useState([{}]);
   const [archs, setArchs] = useState([]);
   const [tags, setTags] = useState([]);
   const [businessTags, setBusinessTags] = useState([]);
@@ -46,6 +46,12 @@ export default () => {
     setDialogType(DialogType.Update);
     tag.query({ params: { type: '业务' } }).then(({ data }) => setBusinessTags(data));
   };
+  const openDeleteDialog = (item) => Dialog.confirm({
+    title: '删除节点',
+    content: '确定删除当前节点？',
+    closeable: false,
+    onOk: () => store.delete({ data: { id: item.id } }).then(refresh),
+  });
   const onCreate = () => {
     field.validate((errors, values) => {
       if (errors) {
@@ -102,6 +108,7 @@ export default () => {
   const renderActions = (value, i, item) => (
     <div className={styles.actions}>
       <Button type="secondary" onClick={() => openUpdateDialog(item)}>编辑</Button>
+      <Button type="normal" warning onClick={() => openDeleteDialog(item)}>删除</Button>
       <Button type="normal" disabled={item.online} onClick={() => onCopyURL(item)}>复制链接</Button>
     </div>
   );
@@ -120,7 +127,7 @@ export default () => {
         <Table.Column dataIndex="updatedAt" title="操作时间" cell={renderDate} />
         <Table.Column dataIndex="parallel" title="并发数量" />
         <Table.Column dataIndex="online" title="状态" cell={renderStatus} />
-        <Table.Column title="操作" width={190} cell={renderActions} />
+        <Table.Column title="操作" width={240} cell={renderActions} />
       </Table>
       <Pagination
         className={styles.pagination}
@@ -140,7 +147,7 @@ export default () => {
         onCancel={() => setDialogType(DialogType.None)}
       >
         <Form field={field} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }} style={{ width: 380 }}>
-          <Form.Item label="名称：" required requiredMessage="必填项不能为空" pattern={/^[a-z]+[0-9a-zA-Z-]*$/} patternMessage="名称只能包含字母、数字或减号且开头必须是小写字母">
+          <Form.Item label="名称：" required requiredMessage="必填项不能为空" pattern={/^[a-z]+[0-9a-z-]*$/} patternMessage="名称只能包含小写字母、数字或减号且开头必须是小写字母">
             <Input name="name" trim />
           </Form.Item>
           <Form.Item label="型号：" required requiredMessage="必填项不能为空">
