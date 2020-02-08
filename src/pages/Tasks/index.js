@@ -104,7 +104,7 @@ export default () => {
     setSelectedNodes(item.nodes);
     setDialogType(DialogType.Update);
     service.queryNodes({}, { serviceId: item.service_id }).then(({ data }) => {
-      setNodes(data);
+      setNodes(item.nodes.concat(data));
       // setFilters(flatten(data.map(({ buss_tags }) => buss_tags))
       //   .map(({ id, name }) => ({ label: name, value: id })));
     });
