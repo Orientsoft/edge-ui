@@ -9,7 +9,7 @@
     "@icedesign/theme": "^1.0.0",
     "@pixcai/make-api": "^0.0.4",
     "classnames": "^2.2.5",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "moment": "^2.24.0",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
