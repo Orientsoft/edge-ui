@@ -10,7 +10,7 @@
     "@pixcai/make-api": "^0.0.4",
     "classnames": "^2.2.5",
     "lodash-es": "^4.17.15",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
     "react-router-dom": "^5.0.1"
